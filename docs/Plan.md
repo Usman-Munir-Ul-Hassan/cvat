@@ -31,14 +31,22 @@ Having successfully delivered and verified the mandatory floor (Items 1–4) wit
 |---|---|---|---|---|
 | **5** | **Item 5: Authentication & Task Permissions** | 1. In `cvat/apps/test/views.py`, enforce `permissions.IsAuthenticated` so unauthenticated requests receive `401 Unauthorized`.<br>2. Integrate CVAT's `TaskPermission.create_scope_view(request, task)` to verify user access; return `403 Forbidden` if unauthorized.<br>3. In the UI, display a clean "Access Denied" state on 401/403 responses.<br>4. Test both negative cases (unauthenticated 401, unauthorized user 403) and positive case (authenticated owner 200). | 0.5 Hour (Actual: 0.25h) | **Completed** ✅ |
 
+## 3. Milestone 3: Item 6 (Speed Target Measurement)
+
+Having delivered Items 1 through 5, we now establish, measure, and report a concrete speed target for the endpoint.
+
+| Order | Deliverable | How We Will Reach It | Estimated Time | Status |
+|---|---|---|---|---|
+| **6** | **Item 6: Speed Target Measurement** | 1. Define measurable latency target for `/api/test/tasks/<id>/counts/` (Median $\le$ 60 ms).<br>2. Run 5 consecutive authenticated measurement trials on Task #1.<br>3. Record raw outputs, compute median and spread.<br>4. Document methodology, raw output, and analysis in `Objectives.md` and `Definition_of_Done.md`. | 0.25 Hour | **In Progress** ⏳ |
+
 ---
 
-## 3. What We Have Decided to Skip & Why
-- **Skipped: Items 6 & 7 (Speed targets & custom grouping)**:
-  - *Decision*: Held in reserve while completing Item 5.
+## 4. What We Have Decided to Skip & Why
+- **Skipped: Item 7 (Custom Filter / Grouping)**:
+  - *Decision*: Held in reserve while completing Item 6.
 - **Skipped: Items 8 & 9 (Live WebSocket Updates & Auto-Reconnect)**:
   - *Decision*: Explicitly skipped from our time-boxed plan.
-  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of Items 1–5 scores far higher than an unstable real-time prototype.
+  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of completed items scores far higher than an unstable real-time prototype.
 
 ---
 
