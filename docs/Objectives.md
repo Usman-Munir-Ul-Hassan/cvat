@@ -62,5 +62,19 @@
 | | **Actual Result** | **100% Verified across all 3 criteria**:<br>1. Unauthenticated request returned `HTTP/1.1 401 Unauthorized` with `{"detail":"Authentication credentials were not provided."}`.<br>2. Non-owner request with `restricted_user` token returned `HTTP/1.1 403 Forbidden` with `{"detail":"You do not have permission to view this task."}`.<br>3. Owner request with `admin` token returned `HTTP/1.1 200 OK` with complete 12-class dataset. |
 | | **Status** | **PASSED** ✅ |
 
+### OBJ-6: Endpoint meets latency speed target (Item 6)
+
+| ID | Field | Entry |
+|---|---|---|
+| **MO-6** | **What is measured** | Total round-trip latency of the `/api/test/tasks/1/counts/` endpoint across 5 consecutive authenticated runs. |
+| | **How** | Automated HTTP GET requests via `curl` with precision timing (`-w "%{time_total} s\n"`) and Authorization token. |
+| | **Target** | Median response time $\le$ 60 ms. |
+| | **Conditions** | Local Docker stack running, requesting Task #1 (37 annotations, 12 classes). |
+| | **Not included** | Cold-start first load or simulated network throttling. |
+| | **Raw Output** | `Run 1: 0.052327 s (52.3 ms)`<br>`Run 2: 0.050510 s (50.5 ms)`<br>`Run 3: 0.051014 s (51.0 ms)`<br>`Run 4: 0.060935 s (60.9 ms)`<br>`Run 5: 0.052183 s (52.2 ms)` |
+| | **Actual Result** | **Target Met**:<br>- **Median**: **52.2 ms** (below the 60 ms target threshold)<br>- **Spread**: **50.5 ms – 60.9 ms** (Range: 10.4 ms) |
+| | **Status** | **PASSED** ✅ |
+
 ---
+
 

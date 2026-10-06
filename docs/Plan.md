@@ -37,7 +37,7 @@ Having delivered Items 1 through 5, we now establish, measure, and report a conc
 
 | Order | Deliverable | How We Will Reach It | Estimated Time | Status |
 |---|---|---|---|---|
-| **6** | **Item 6: Speed Target Measurement** | 1. Define measurable latency target for `/api/test/tasks/<id>/counts/` (Median $\le$ 60 ms).<br>2. Run 5 consecutive authenticated measurement trials on Task #1.<br>3. Record raw outputs, compute median and spread.<br>4. Document methodology, raw output, and analysis in `Objectives.md` and `Definition_of_Done.md`. | 0.25 Hour | **In Progress** ⏳ |
+| **6** | **Item 6: Speed Target Measurement** | 1. Define measurable latency target for `/api/test/tasks/<id>/counts/` (Median $\le$ 60 ms).<br>2. Run 5 consecutive authenticated measurement trials on Task #1.<br>3. Record raw outputs, compute median and spread.<br>4. Document methodology, raw output, and analysis in `Objectives.md` and `Definition_of_Done.md`. | 0.25 Hour (Actual: 0.15h) | **Completed** ✅ |
 
 ---
 

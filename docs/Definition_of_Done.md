@@ -32,11 +32,18 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
     3. Authorized owner request (`admin` token) returns `HTTP/1.1 200 OK` with complete 12-class dataset.
     4. Frontend catches 401/403 status codes and renders an Ant Design Access Denied alert with a "Back to Tasks" navigation button.
 
+- [x] **Item 6: Speed Target Measurement**
+  - *Criteria*: Endpoint response time measured over 5 consecutive runs. Objective target set, raw numbers saved, median and spread reported.
+  - *Evidence*: **VERIFIED**.
+    - Target: Median latency $\le$ 60 ms.
+    - Raw 5-run outputs: `[52.3 ms, 50.5 ms, 51.0 ms, 60.9 ms, 52.2 ms]`.
+    - Computed metrics: **Median = 52.2 ms**, **Spread = 50.5 ms – 60.9 ms** (Range: 10.4 ms).
+    - Status: Target achieved.
+
 ---
 
 ## 2. Declared Unfinished Work (Required by Assessment Rules)
-The following items were intentionally not attempted or deferred to ensure delivered items (1–5) are rock-solid:
-- **Item 6 (Speed Target Measurement)**: Deferred to secondary milestone.
+The following items were intentionally not attempted or deferred to ensure delivered items (1–6) are rock-solid:
 - **Item 7 (Custom Filter / Grouping)**: Deferred to secondary milestone.
 - **Item 8 (WebSocket Live Updates)**: Skipped due to architectural complexity within 8 hours.
 - **Item 9 (WebSocket Reconnection)**: Skipped alongside Item 8.
