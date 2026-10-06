@@ -18,11 +18,11 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
   - *Criteria*: Graph component renders class labels and numeric count bars cleanly.
   - *Evidence*: **VERIFIED**. Bar Chart renders all 12 classes with distinct colors, horizontal proportional bars, class names, and numeric count badges (`person: 12`, `bottle: 8`, etc.).
 
-- [ ] **Item 4: Clean Handling of Empty and Error Cases**
+- [x] **Item 4: Clean Handling of Empty and Error Cases**
   - *Criteria*:
     - **No Data**: A task with 0 annotations shows a clear Ant Design `<Empty>` state message instead of a broken chart.
     - **Failed Request**: A 404 or network failure shows a clear `<Alert>` with an error message and retry button.
-  - *Evidence*: `pending`
+  - *Evidence*: **VERIFIED**. Tested Task #3 (`/tasks/3/analytics`) with 0 annotations, confirming clean Ant Design `<Empty>` state ("No annotations found for this task") and "Back to Task #3" action button. Tested non-existent task (`/tasks/99999/analytics`), confirming red Ant Design `<Alert type="error">` with message "Task 99999 not found" and functional "Retry" button that dispatches a fresh API request.
 
 ---
 

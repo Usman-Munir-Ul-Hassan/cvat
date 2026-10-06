@@ -35,6 +35,8 @@
 | | **Target** | A visible "No annotations found for this task" message is displayed. No broken chart or blank screen. |
 | | **Conditions** | A newly created task with uploaded images but zero drawn annotations. |
 | | **Not included** | Tasks with annotations that were later deleted. |
+| | **Actual Result** | **Verified in Chrome**. Visited `http://localhost:8080/tasks/3/analytics` (0 annotations). Confirmed clean Ant Design `<Empty>` state with "No annotations found for this task" and "Back to Task #3" action button. |
+| | **Status** | **PASSED** ✅ |
 
 ### OBJ-4: API or network failures display a clear error message
 
@@ -45,5 +47,7 @@
 | | **Target** | A visible error alert with the message "Failed to load annotation counts" and a clickable retry button. |
 | | **Conditions** | CVAT Docker stack running, requesting a task ID that does not exist in the database. |
 | | **Not included** | Simulated Docker container crashes or database offline scenarios. |
+| | **Actual Result** | **Verified in Chrome**. Visited `http://localhost:8080/tasks/99999/analytics`. Confirmed red Ant Design `<Alert type="error">` banner displayed with "Failed to load annotation counts", server message "Task 99999 not found.", and a clickable "Retry" button that dispatches a fresh API call. |
+| | **Status** | **PASSED** ✅ |
 
 ---
