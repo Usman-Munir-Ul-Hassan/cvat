@@ -52,6 +52,7 @@ urlpatterns = [
         name="redoc",
     ),
     # entry point for API
+    path("api/test/", include("cvat.apps.test.urls")),
     path("api/", include("cvat.apps.iam.urls")),
     path("api/", include("cvat.apps.organizations.urls")),
     path("api/", include(router.urls)),
