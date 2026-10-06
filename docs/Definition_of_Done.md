@@ -24,11 +24,18 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
     - **Failed Request**: A 404 or network failure shows a clear `<Alert>` with an error message and retry button.
   - *Evidence*: **VERIFIED**. Tested Task #3 (`/tasks/3/analytics`) with 0 annotations, confirming clean Ant Design `<Empty>` state ("No annotations found for this task") and "Back to Task #3" action button. Tested non-existent task (`/tasks/99999/analytics`), confirming red Ant Design `<Alert type="error">` with message "Task 99999 not found" and functional "Retry" button that dispatches a fresh API request.
 
+- [x] **Item 5: Authentication & Task Permissions**
+  - *Criteria*: Endpoint uses CVAT's existing authentication. Refuses unauthenticated requests (HTTP 401), refuses users without task access (HTTP 403), and permits authorized users/owners (HTTP 200).
+  - *Evidence*: **VERIFIED**.
+    1. Unauthenticated request (`curl http://localhost:8080/api/test/tasks/1/counts/`) returns `HTTP/1.1 401 Unauthorized` with `{"detail":"Authentication credentials were not provided."}`.
+    2. Restricted non-owner user request (`restricted_user` token) returns `HTTP/1.1 403 Forbidden` with `{"detail":"You do not have permission to view this task."}`.
+    3. Authorized owner request (`admin` token) returns `HTTP/1.1 200 OK` with complete 12-class dataset.
+    4. Frontend catches 401/403 status codes and renders an Ant Design Access Denied alert with a "Back to Tasks" navigation button.
+
 ---
 
 ## 2. Declared Unfinished Work (Required by Assessment Rules)
-The following items were intentionally not attempted or deferred to ensure the mandatory floor is rock-solid:
-- **Item 5 (Authentication & Task Permissions)**: Deferred to secondary milestone.
+The following items were intentionally not attempted or deferred to ensure delivered items (1–5) are rock-solid:
 - **Item 6 (Speed Target Measurement)**: Deferred to secondary milestone.
 - **Item 7 (Custom Filter / Grouping)**: Deferred to secondary milestone.
 - **Item 8 (WebSocket Live Updates)**: Skipped due to architectural complexity within 8 hours.

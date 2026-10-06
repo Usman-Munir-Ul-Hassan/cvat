@@ -29,7 +29,7 @@ Having successfully delivered and verified the mandatory floor (Items 1–4) wit
 
 | Order | Deliverable | How We Will Reach It | Estimated Time | Status |
 |---|---|---|---|---|
-| **5** | **Item 5: Authentication & Task Permissions** | 1. In `cvat/apps/test/views.py`, enforce `permissions.IsAuthenticated` so unauthenticated requests receive `401 Unauthorized`.<br>2. Integrate CVAT's `TaskPermission.create_scope_view(request, task)` to verify user access; return `403 Forbidden` if unauthorized.<br>3. In the UI, display a clean "Access Denied" state on 401/403 responses.<br>4. Test both negative cases (unauthenticated 401, unauthorized user 403) and positive case (authenticated owner 200). | 0.5 Hour | **In Progress** ⏳ |
+| **5** | **Item 5: Authentication & Task Permissions** | 1. In `cvat/apps/test/views.py`, enforce `permissions.IsAuthenticated` so unauthenticated requests receive `401 Unauthorized`.<br>2. Integrate CVAT's `TaskPermission.create_scope_view(request, task)` to verify user access; return `403 Forbidden` if unauthorized.<br>3. In the UI, display a clean "Access Denied" state on 401/403 responses.<br>4. Test both negative cases (unauthenticated 401, unauthorized user 403) and positive case (authenticated owner 200). | 0.5 Hour (Actual: 0.25h) | **Completed** ✅ |
 
 ---
 

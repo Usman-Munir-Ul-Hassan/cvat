@@ -50,4 +50,17 @@
 | | **Actual Result** | **Verified in Chrome**. Visited `http://localhost:8080/tasks/99999/analytics`. Confirmed red Ant Design `<Alert type="error">` banner displayed with "Failed to load annotation counts", server message "Task 99999 not found.", and a clickable "Retry" button that dispatches a fresh API call. |
 | | **Status** | **PASSED** ✅ |
 
+### OBJ-5: Endpoint enforces authentication and object-level task permissions
+
+| ID | Field | Entry |
+|---|---|---|
+| **MO-5** | **What is measured** | Whether `/api/test/tasks/{task_id}/counts/` refuses requests with no login (401), refuses users without task access (403), and permits authorized users/owners (200). |
+| | **How** | 1. Send unauthenticated request without credentials: `curl http://localhost:8080/api/test/tasks/1/counts/`<br>2. Send authenticated request with non-owner token (`restricted_user`): `curl -H "Authorization: Token <token>" http://localhost:8080/api/test/tasks/1/counts/`<br>3. Send authenticated request with owner token (`admin`): `curl -H "Authorization: Token <admin_token>" http://localhost:8080/api/test/tasks/1/counts/` |
+| | **Target** | Unauthenticated = `401 Unauthorized`; Unauthorized non-owner = `403 Forbidden`; Authorized owner = `200 OK`. |
+| | **Conditions** | CVAT Docker stack running, Task #1 owned by `admin`, separate non-owner user `restricted_user` in database. |
+| | **Not included** | Multi-organization SSO providers or OAuth identity bridges. |
+| | **Actual Result** | **100% Verified across all 3 criteria**:<br>1. Unauthenticated request returned `HTTP/1.1 401 Unauthorized` with `{"detail":"Authentication credentials were not provided."}`.<br>2. Non-owner request with `restricted_user` token returned `HTTP/1.1 403 Forbidden` with `{"detail":"You do not have permission to view this task."}`.<br>3. Owner request with `admin` token returned `HTTP/1.1 200 OK` with complete 12-class dataset. |
+| | **Status** | **PASSED** ✅ |
+
 ---
+
