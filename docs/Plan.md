@@ -23,14 +23,22 @@ We are focusing exclusively on completing and verifying Items 1 through 4 with z
 > - **Verification**: Full manual testing passed with concrete evidence gathered in 0.5h.
 > Total time spent: **2.5 Hours** out of 3.5 Hours budgeted (1.0 hour remaining buffer). Mandatory floor delivered with zero defects.
 
+## 2. Milestone 2: Item 5 (Authentication & Task Permissions)
+
+Having successfully delivered and verified the mandatory floor (Items 1–4) with zero defects, we now tackle Item 5 to secure the endpoint using CVAT's existing authentication and permission framework.
+
+| Order | Deliverable | How We Will Reach It | Estimated Time | Status |
+|---|---|---|---|---|
+| **5** | **Item 5: Authentication & Task Permissions** | 1. In `cvat/apps/test/views.py`, enforce `permissions.IsAuthenticated` so unauthenticated requests receive `401 Unauthorized`.<br>2. Integrate CVAT's `TaskPermission.create_scope_view(request, task)` to verify user access; return `403 Forbidden` if unauthorized.<br>3. In the UI, display a clean "Access Denied" state on 401/403 responses.<br>4. Test both negative cases (unauthenticated 401, unauthorized user 403) and positive case (authenticated owner 200). | 0.5 Hour | **In Progress** ⏳ |
+
 ---
 
 ## 3. What We Have Decided to Skip & Why
-- **Skipped: Items 5 to 7 (Auth extensions, speed targets, custom grouping)**:
-  - *Decision*: Held in reserve. We will only evaluate tackling these after Items 1–4 are fully built, tested, and evidence is gathered.
+- **Skipped: Items 6 & 7 (Speed targets & custom grouping)**:
+  - *Decision*: Held in reserve while completing Item 5.
 - **Skipped: Items 8 & 9 (Live WebSocket Updates & Auto-Reconnect)**:
   - *Decision*: Explicitly skipped from our time-boxed plan.
-  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of the floor (Items 1–4) scores far higher than an unstable real-time prototype.
+  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of Items 1–5 scores far higher than an unstable real-time prototype.
 
 ---
 
