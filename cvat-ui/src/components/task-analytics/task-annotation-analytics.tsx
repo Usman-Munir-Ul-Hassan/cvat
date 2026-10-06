@@ -86,20 +86,12 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
     }
 
     const totalAnnotations = counts.reduce((acc, curr) => acc + curr.count, 0);
+    const maxCount = Math.max(...counts.map((item) => item.count), 1);
 
-    const columns = [
-        {
-            title: 'Class Label',
-            dataIndex: 'label',
-            key: 'label',
-            render: (text: string) => <strong>{text}</strong>,
-        },
-        {
-            title: 'Count',
-            dataIndex: 'count',
-            key: 'count',
-            sorter: (a: AnnotationCount, b: AnnotationCount) => a.count - b.count,
-        },
+    const colors = [
+        '#1890ff', '#13c2c2', '#52c41a', '#faad14', '#f5222d',
+        '#722ed1', '#eb2f96', '#fa8c16', '#2f54eb', '#a0d911',
+        '#fa541c', '#13a8a8',
     ];
 
     return (
@@ -108,7 +100,7 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
                 <Row justify='space-between' align='middle'>
                     <Col>
                         <Title level={4} style={{ margin: 0 }}>
-                            Annotation Analytics (Task #{taskId})
+                            📊 Annotation Analytics (Task #{taskId})
                         </Title>
                     </Col>
                     <Col>
@@ -124,12 +116,52 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
                 </Button>
             }
         >
-            <Table
-                dataSource={counts.map((item, index) => ({ ...item, key: index }))}
-                columns={columns}
-                pagination={false}
-                size='middle'
-            />
+            <Title level={5} style={{ marginBottom: 16 }}>Annotation Distribution (Bar Chart)</Title>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {counts.map((item, index) => {
+                    const widthPct = Math.max((item.count / maxCount) * 100, 3);
+                    const color = colors[index % colors.length];
+                    return (
+                        <Row key={item.label} align='middle' style={{ minHeight: 28 }}>
+                            <Col span={6} style={{ textAlign: 'right', paddingRight: 16 }}>
+                                <Text strong style={{ fontSize: 13 }}>{item.label}</Text>
+                            </Col>
+                            <Col span={15}>
+                                <div
+                                    style={{
+                                        background: '#f5f5f5',
+                                        borderRadius: 4,
+                                        overflow: 'hidden',
+                                        height: 24,
+                                        position: 'relative',
+                                    }}
+                                >
+                                    <div
+                                        style={{
+                                            width: `${widthPct}%`,
+                                            backgroundColor: color,
+                                            height: '100%',
+                                            borderRadius: 4,
+                                            transition: 'width 0.4s ease-in-out',
+                                        }}
+                                    />
+                                </div>
+                            </Col>
+                            <Col span={3} style={{ paddingLeft: 12 }}>
+                                <span
+                                    style={{
+                                        fontWeight: 'bold',
+                                        color,
+                                        fontSize: 13,
+                                    }}
+                                >
+                                    {item.count}
+                                </span>
+                            </Col>
+                        </Row>
+                    );
+                })}
+            </div>
         </Card>
     );
 }

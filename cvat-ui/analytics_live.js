@@ -1,129 +1,161 @@
 // CVAT Annotation Analytics Client Script (Items 2-4)
 (function () {
-  console.log('[Analytics] Live analytics module initialized.');
+  console.log('[Analytics] Live analytics module active.');
 
   function injectAnalytics() {
     const path = window.location.pathname;
-    const analyticsMatch = path.match(/\/tasks\/(\d+)\/analytics/);
 
+    // Case 1: On dedicated analytics route /tasks/:id/analytics
+    const analyticsMatch = path.match(/\/tasks\/(\d+)\/analytics/);
     if (analyticsMatch) {
       const taskId = analyticsMatch[1];
       renderAnalyticsPage(taskId);
       return;
     }
 
+    // Case 2: On main task page /tasks/:id
     const taskMatch = path.match(/\/tasks\/(\d+)$/);
     if (taskMatch) {
       const taskId = taskMatch[1];
-      injectTaskButton(taskId);
+      injectTaskAnalyticsSection(taskId);
     }
   }
 
-  function injectTaskButton(taskId) {
-    if (document.getElementById('cvat-analytics-btn')) return;
+  // 1. Dedicated Analytics Route (/tasks/:id/analytics)
+  function renderAnalyticsPage(taskId) {
+    const existing = document.getElementById('cvat-analytics-container');
+    if (existing && existing.dataset.taskId === taskId) return;
+
+    // Only inject inside CVAT's inner analytics container or paid placeholder
+    const inner = document.querySelector('.cvat-analytics-inner');
+    const placeholder = document.querySelector('.cvat-paid-feature-placeholder');
+
+    if (!inner && !placeholder) {
+      // If layout hasn't mounted yet, wait for next tick
+      return;
+    }
+
+    if (existing) existing.remove();
+
+    if (placeholder) {
+      placeholder.style.display = 'none';
+    }
+
+    const container = document.createElement('div');
+    container.id = 'cvat-analytics-container';
+    container.dataset.taskId = taskId;
+    container.style.width = '100%';
+    container.style.marginTop = '16px';
+
+    container.innerHTML = getAnalyticsCardHTML(taskId);
+
+    if (inner) {
+      inner.appendChild(container);
+    } else if (placeholder && placeholder.parentElement) {
+      placeholder.parentElement.appendChild(container);
+    }
+
+    attachEventListeners(taskId);
+    loadData(taskId);
+  }
+
+  // 2. Embedded on Main Task Page (/tasks/:id)
+  function injectTaskAnalyticsSection(taskId) {
+    // Add "Analytics" button next to "Actions"
     const actionsBtn = document.querySelector('.cvat-task-page-actions-button') || document.querySelector('.cvat-actions-menu-button');
-    if (actionsBtn && actionsBtn.parentElement) {
+    if (actionsBtn && actionsBtn.parentElement && !document.getElementById('cvat-analytics-btn')) {
       const btn = document.createElement('button');
       btn.id = 'cvat-analytics-btn';
       btn.className = 'ant-btn ant-btn-default';
       btn.style.marginRight = '8px';
       btn.innerHTML = '<span>📊 Analytics</span>';
       btn.onclick = function () {
-        window.location.href = `/tasks/${taskId}/analytics`;
+        const target = document.getElementById('cvat-task-analytics-card');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          window.location.href = `/tasks/${taskId}/analytics`;
+        }
       };
       actionsBtn.parentElement.insertBefore(btn, actionsBtn);
     }
+
+    // Embed Analytics card right before Jobs list on the task page
+    if (document.getElementById('cvat-task-analytics-card')) return;
+    const jobsList = document.querySelector('.cvat-task-jobs-list-wrapper') || document.querySelector('.cvat-job-list-component');
+    const detailsWrapper = document.querySelector('.cvat-task-details-wrapper .ant-col');
+
+    if (!detailsWrapper && !jobsList) return;
+
+    const embedContainer = document.createElement('div');
+    embedContainer.id = 'cvat-task-analytics-card';
+    embedContainer.dataset.taskId = taskId;
+    embedContainer.style.width = '100%';
+    embedContainer.style.margin = '24px 0';
+
+    embedContainer.innerHTML = getAnalyticsCardHTML(taskId);
+
+    if (jobsList && jobsList.parentElement) {
+      jobsList.parentElement.insertBefore(embedContainer, jobsList);
+    } else if (detailsWrapper) {
+      detailsWrapper.appendChild(embedContainer);
+    }
+
+    attachEventListeners(taskId);
+    loadData(taskId);
   }
 
-  function renderAnalyticsPage(taskId) {
-    const existing = document.getElementById('cvat-analytics-container');
-    if (existing && existing.dataset.taskId === taskId) return;
-
-    // Check if the placeholder or analytics wrapper is ready
-    let target = document.querySelector('.cvat-analytics-inner') || 
-                 document.querySelector('.cvat-analytics-inner-wrapper') || 
-                 document.querySelector('.cvat-analytics-page') ||
-                 document.getElementById('root');
-
-    if (!target) return;
-
-    if (existing) existing.remove();
-
-    const container = document.createElement('div');
-    container.id = 'cvat-analytics-container';
-    container.dataset.taskId = taskId;
-    container.style.padding = '24px';
-    container.style.maxWidth = '1100px';
-    container.style.margin = '0 auto';
-    container.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial';
-
-    // Hide any existing paid placeholder
-    const placeholder = document.querySelector('.cvat-paid-feature-placeholder');
-    if (placeholder) placeholder.style.display = 'none';
-
-    container.innerHTML = `
-      <div style="margin-bottom: 16px;">
-        <button id="cvat-back-btn" class="ant-btn ant-btn-link" style="padding-left: 0; font-size: 14px;">
-          ← Back to Task #${taskId}
-        </button>
-      </div>
-      <div class="ant-card ant-card-bordered" style="border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); background: #fff;">
+  function getAnalyticsCardHTML(taskId) {
+    return `
+      <div class="ant-card ant-card-bordered" style="border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); background: #fff; width: 100%;">
         <div class="ant-card-head" style="border-bottom: 1px solid #f0f0f0; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
           <div>
-            <h2 style="margin: 0; font-size: 18px; font-weight: 600; color: #1f1f1f;">
+            <div style="font-size: 16px; font-weight: 600; color: #262626;">
               📊 Annotation Analytics (Task #${taskId})
-            </h2>
-            <div id="analytics-summary" style="margin-top: 4px; font-size: 13px; color: #8c8c8c;"></div>
+            </div>
+            <div class="analytics-summary-text" style="margin-top: 4px; font-size: 13px; color: #8c8c8c;"></div>
           </div>
           <div>
-            <button id="analytics-refresh-btn" class="ant-btn ant-btn-default ant-btn-sm" style="border-radius: 4px;">
+            <button class="ant-btn ant-btn-default ant-btn-sm analytics-refresh-btn" style="border-radius: 4px;">
               🔄 Refresh
             </button>
           </div>
         </div>
-        <div class="ant-card-body" id="analytics-body" style="padding: 24px;">
-          <div style="text-align: center; padding: 48px 0;">
+        <div class="ant-card-body analytics-body" style="padding: 24px;">
+          <div style="text-align: center; padding: 40px 0;">
             <div class="ant-spin ant-spin-spinning ant-spin-lg" style="margin-bottom: 12px;">
               <span class="ant-spin-dot ant-spin-dot-spin">
                 <i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i>
                 <i class="ant-spin-dot-item"></i><i class="ant-spin-dot-item"></i>
               </span>
             </div>
-            <div style="color: #8c8c8c;">Loading annotation counts...</div>
+            <div style="color: #8c8c8c; font-size: 13px;">Loading annotation counts...</div>
           </div>
         </div>
       </div>
     `;
+  }
 
-    // Insert container
-    if (document.querySelector('.cvat-analytics-inner')) {
-      const inner = document.querySelector('.cvat-analytics-inner');
-      inner.prepend(container);
-    } else {
-      target.appendChild(container);
-    }
-
-    document.getElementById('cvat-back-btn').onclick = function () {
-      window.location.href = `/tasks/${taskId}`;
-    };
-
-    document.getElementById('analytics-refresh-btn').onclick = function () {
-      loadData(taskId);
-    };
-
-    loadData(taskId);
+  function attachEventListeners(taskId) {
+    document.querySelectorAll('.analytics-refresh-btn').forEach(function (btn) {
+      btn.onclick = function () {
+        loadData(taskId);
+      };
+    });
   }
 
   function loadData(taskId) {
-    const body = document.getElementById('analytics-body');
-    const summary = document.getElementById('analytics-summary');
-    if (!body) return;
+    const bodies = document.querySelectorAll('.analytics-body');
+    const summaries = document.querySelectorAll('.analytics-summary-text');
+    if (!bodies.length) return;
 
-    body.innerHTML = `
-      <div style="text-align: center; padding: 48px 0;">
-        <div style="color: #1890ff; font-size: 16px;">⏳ Fetching per-class counts from API...</div>
-      </div>
-    `;
+    bodies.forEach(function (body) {
+      body.innerHTML = `
+        <div style="text-align: center; padding: 36px 0;">
+          <div style="color: #1890ff; font-size: 14px;">⏳ Querying /api/test/tasks/${taskId}/counts/...</div>
+        </div>
+      `;
+    });
 
     fetch(`/api/test/tasks/${taskId}/counts/`)
       .then(function (res) {
@@ -138,69 +170,92 @@
       })
       .then(function (data) {
         if (!data || data.length === 0) {
-          if (summary) summary.innerText = 'No annotations present on this task';
-          body.innerHTML = `
-            <div style="text-align: center; padding: 48px 0;">
-              <div style="font-size: 40px; margin-bottom: 12px;">📭</div>
-              <div style="font-size: 16px; font-weight: 500; color: #595959;">No annotations found for this task</div>
-              <div style="font-size: 13px; color: #8c8c8c; margin-top: 6px;">Draw shapes on the task images or import a dataset to see analytics.</div>
-            </div>
-          `;
+          summaries.forEach(function (s) { s.innerText = 'No annotations present on this task'; });
+          bodies.forEach(function (body) {
+            body.innerHTML = `
+              <div style="text-align: center; padding: 40px 0;">
+                <div style="font-size: 36px; margin-bottom: 8px;">📭</div>
+                <div style="font-size: 15px; font-weight: 500; color: #595959;">No annotations found for this task</div>
+                <div style="font-size: 13px; color: #8c8c8c; margin-top: 4px;">Task has 0 annotations drawn or imported.</div>
+              </div>
+            `;
+          });
           return;
         }
 
         const totalCount = data.reduce(function (sum, item) { return sum + item.count; }, 0);
-        if (summary) {
-          summary.innerText = `Total: ${totalCount} annotations across ${data.length} classes`;
-        }
+        const maxCount = Math.max(...data.map(function (item) { return item.count; }), 1);
 
-        let tableRows = data.map(function (item, idx) {
+        summaries.forEach(function (s) {
+          s.innerText = `Total: ${totalCount} annotations across ${data.length} classes`;
+        });
+
+        const colors = [
+          '#1890ff', '#13c2c2', '#52c41a', '#faad14', '#f5222d',
+          '#722ed1', '#eb2f96', '#fa8c16', '#2f54eb', '#a0d911',
+          '#fa541c', '#096dd9'
+        ];
+
+        // 1. Generate Bar Chart HTML
+        let barChartRows = data.map(function (item, idx) {
+          const widthPct = Math.max((item.count / maxCount) * 100, 4);
+          const color = colors[idx % colors.length];
           const pct = Math.round((item.count / totalCount) * 100);
           return `
-            <tr style="border-bottom: 1px solid #f0f0f0;">
-              <td style="padding: 12px 16px; font-weight: 500;">${item.label}</td>
-              <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: #1890ff;">${item.count}</td>
-              <td style="padding: 12px 16px; text-align: right; color: #8c8c8c;">${pct}%</td>
-            </tr>
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+              <div style="width: 130px; text-align: right; padding-right: 14px; font-weight: 500; font-size: 13px; color: #262626; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${item.label}">
+                ${item.label}
+              </div>
+              <div style="flex: 1; background: #f0f2f5; border-radius: 4px; height: 24px; position: relative; overflow: hidden;">
+                <div style="width: ${widthPct}%; background: ${color}; height: 100%; border-radius: 4px; transition: width 0.4s ease-out; display: flex; align-items: center; justify-content: flex-end; padding-right: 8px;">
+                  ${widthPct > 15 ? `<span style="color: #fff; font-size: 11px; font-weight: 600;">${pct}%</span>` : ''}
+                </div>
+              </div>
+              <div style="width: 50px; padding-left: 10px; font-weight: 700; font-size: 13px; color: ${color};">
+                ${item.count}
+              </div>
+            </div>
           `;
         }).join('');
 
-        body.innerHTML = `
-          <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-              <thead>
-                <tr style="background: #fafafa; border-bottom: 1px solid #f0f0f0;">
-                  <th style="padding: 12px 16px; color: #595959; font-weight: 600;">Class Label</th>
-                  <th style="padding: 12px 16px; text-align: right; color: #595959; font-weight: 600;">Count</th>
-                  <th style="padding: 12px 16px; text-align: right; color: #595959; font-weight: 600;">Share (%)</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${tableRows}
-              </tbody>
-            </table>
+        const contentHTML = `
+          <!-- Bar Chart Section (Item 3) -->
+          <div style="background: #fafafa; border: 1px solid #f0f0f0; border-radius: 6px; padding: 18px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <div style="font-size: 14px; font-weight: 600; color: #262626;">📊 Annotation Distribution (Bar Chart)</div>
+              <span style="font-size: 12px; color: #8c8c8c;">Highest count: ${maxCount}</span>
+            </div>
+            <div style="display: flex; flex-direction: column;">
+              ${barChartRows}
+            </div>
           </div>
         `;
+
+        bodies.forEach(function (body) {
+          body.innerHTML = contentHTML;
+        });
       })
       .catch(function (err) {
-        if (summary) summary.innerText = '';
-        body.innerHTML = `
-          <div style="background: #fff2f0; border: 1px solid #ffccc7; border-radius: 6px; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center;">
+        summaries.forEach(function (s) { s.innerText = ''; });
+        const errorHTML = `
+          <div style="background: #fff2f0; border: 1px solid #ffccc7; border-radius: 6px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <div style="font-weight: 600; color: #cf1322; margin-bottom: 4px;">❌ Failed to load annotation counts</div>
+              <div style="font-weight: 600; color: #cf1322; margin-bottom: 2px;">❌ Failed to load annotation counts</div>
               <div style="color: #434343; font-size: 13px;">${err.message}</div>
             </div>
-            <button id="analytics-retry-btn" class="ant-btn ant-btn-primary ant-btn-dangerous ant-btn-sm" style="border-radius: 4px;">
+            <button class="ant-btn ant-btn-primary ant-btn-dangerous ant-btn-sm analytics-retry-btn" style="border-radius: 4px;">
               Retry
             </button>
           </div>
         `;
-        const retryBtn = document.getElementById('analytics-retry-btn');
-        if (retryBtn) {
-          retryBtn.onclick = function () {
+        bodies.forEach(function (body) {
+          body.innerHTML = errorHTML;
+        });
+        document.querySelectorAll('.analytics-retry-btn').forEach(function (btn) {
+          btn.onclick = function () {
             loadData(taskId);
           };
-        }
+        });
       });
   }
 
