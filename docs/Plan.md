@@ -39,14 +39,28 @@ Having delivered Items 1 through 5, we now establish, measure, and report a conc
 |---|---|---|---|---|
 | **6** | **Item 6: Speed Target Measurement** | 1. Define measurable latency target for `/api/test/tasks/<id>/counts/` (Median $\le$ 60 ms).<br>2. Run 5 consecutive authenticated measurement trials on Task #1.<br>3. Record raw outputs, compute median and spread.<br>4. Document methodology, raw output, and analysis in `Objectives.md` and `Definition_of_Done.md`. | 0.25 Hour (Actual: 0.15h) | **Completed** ✅ |
 
+## 4. Milestone 4: Item 7 (Custom Filter: Geometric Shape Type)
+
+Having completed Items 1 through 6, we now implement one filter beyond the plain count: filtering by geometric shape type (`polygon`, `rectangle`, `polyline`, `points`).
+
+### Why We Chose Geometric Shape Type (Item 7 Rationale)
+In real-world computer vision engineering, deep learning architectures are strictly specialized by annotation geometry:
+- Object detection networks (e.g. YOLO, Faster R-CNN) consume 2D bounding boxes (`rectangle`).
+- Instance segmentation architectures (e.g. Mask R-CNN) require segmentation polygons (`polygon`).
+- Pose estimation and facial landmark models require keypoint coordinates (`points`).
+
+A flat per-class count tells an engineer how many labels exist, but fails to indicate whether the annotations match their model's training pipeline format. Allowing engineers to filter by geometric shape type directly surfaces whether a task contains the required annotation geometry, preventing downstream dataset ingestion failures.
+
+| Order | Deliverable | How We Will Reach It | Estimated Time | Status |
+|---|---|---|---|---|
+| **7** | **Item 7: Shape Type Filter** | 1. In `cvat/apps/test/views.py`, accept optional `?shape_type=` query param, filtering `LabeledShape.objects.filter(type=...)`.<br>2. In the UI, add an Ant Design Select dropdown filter (`All Types`, `Polygon`, `Rectangle`, `Polyline`, `Points`) in the card header.<br>3. Verify filtering with matching type (`polygon` = 37) and non-matching type (`rectangle` = 0) with clean empty state. | 0.25 Hour | **In Progress** ⏳ |
+
 ---
 
-## 4. What We Have Decided to Skip & Why
-- **Skipped: Item 7 (Custom Filter / Grouping)**:
-  - *Decision*: Held in reserve while completing Item 6.
+## 5. What We Have Decided to Skip & Why
 - **Skipped: Items 8 & 9 (Live WebSocket Updates & Auto-Reconnect)**:
   - *Decision*: Explicitly skipped from our time-boxed plan.
-  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of completed items scores far higher than an unstable real-time prototype.
+  - *Rationale*: Setting up bidirectional WebSocket channels, Redis publisher events, and state synchronization inside CVAT's multi-container architecture carries excessive risk of regressions within our sprint. A solid, defect-free delivery of completed items (1–7) scores far higher than an unstable real-time prototype.
 
 ---
 
