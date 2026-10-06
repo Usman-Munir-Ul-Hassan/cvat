@@ -10,13 +10,13 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
   - *Criteria*: Endpoint `/api/test/tasks/<id>/counts/` returns JSON per-class counts matching direct database query on Task #1 (person: 12, bottle: 8, cup: 4, wine glass: 3, cell phone: 2, spoon: 2, dining table: 1, knife: 1, oven: 1, refrigerator: 1, handbag: 1, clock: 1).
   - *Evidence*: **VERIFIED**. Direct HTTP GET to `http://localhost:8080/api/test/tasks/1/counts/` returns HTTP 200 with all 12 classes matching PostgreSQL `LabeledShape` aggregation identically: `[{"label":"person","count":12},{"label":"bottle","count":8},{"label":"cup","count":4},{"label":"wine glass","count":3},{"label":"cell phone","count":2},{"label":"spoon","count":2},{"label":"clock","count":1},{"label":"dining table","count":1},{"label":"handbag","count":1},{"label":"knife","count":1},{"label":"oven","count":1},{"label":"refrigerator","count":1}]`. Tested Task #2 returning `[]` (HTTP 200) and Task #99999 returning `404 Not Found`.
 
-- [ ] **Item 2: Web Interface Page Calls the Endpoint**
+- [x] **Item 2: Web Interface Page Calls the Endpoint**
   - *Criteria*: A page/tab exists in CVAT web interface that triggers an HTTP GET to `/api/test/tasks/<id>/counts/`.
-  - *Evidence*: `pending`
+  - *Evidence*: **VERIFIED**. Navigating to `/tasks/1/analytics` or opening `/tasks/1` triggers an asynchronous HTTP GET request to `/api/test/tasks/1/counts/`, displays loading spinner while fetching, and receives the JSON count array.
 
-- [ ] **Item 3: Counts Shown as a Visual Graph**
+- [x] **Item 3: Counts Shown as a Visual Graph**
   - *Criteria*: Graph component renders class labels and numeric count bars cleanly.
-  - *Evidence*: `pending`
+  - *Evidence*: **VERIFIED**. Bar Chart renders all 12 classes with distinct colors, horizontal proportional bars, class names, and numeric count badges (`person: 12`, `bottle: 8`, etc.).
 
 - [ ] **Item 4: Clean Handling of Empty and Error Cases**
   - *Criteria*:

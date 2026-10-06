@@ -23,6 +23,8 @@
 | | **Target** | All 12 classes visible as distinct bars with their names and count values displayed. |
 | | **Conditions** | Task #1 with annotations loaded, CVAT Docker stack running. |
 | | **Not included** | Mobile responsive layout testing. |
+| | **Actual Result** | **Verified in Chrome**. Visited `http://localhost:8080/tasks/1/analytics` and `http://localhost:8080/tasks/1`. Confirmed 12 labeled bars rendered with distinct colors, proportional widths, and bold count numbers (`person: 12, bottle: 8, cup: 4, wine glass: 3`, etc.). |
+| | **Status** | **PASSED** ✅ |
 
 ### OBJ-3: Empty tasks display a clear "no data" message
 
