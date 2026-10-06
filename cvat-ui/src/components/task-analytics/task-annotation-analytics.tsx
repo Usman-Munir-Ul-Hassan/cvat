@@ -10,6 +10,7 @@ import Alert from 'antd/lib/alert';
 import Empty from 'antd/lib/empty';
 import Button from 'antd/lib/button';
 import Card from 'antd/lib/card';
+import Select from 'antd/lib/select';
 import Typography from 'antd/lib/typography';
 import { ReloadOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
@@ -27,6 +28,7 @@ interface Props {
 function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
     const history = useHistory();
     const [counts, setCounts] = useState<AnnotationCount[] | null>(null);
+    const [shapeType, setShapeType] = useState<string>('all');
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [errorStatus, setErrorStatus] = useState<number | null>(null);
@@ -36,7 +38,8 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
         setError(null);
         setErrorStatus(null);
         try {
-            const response = await fetch(`/api/test/tasks/${taskId}/counts/`);
+            const query = shapeType !== 'all' ? `?shape_type=${encodeURIComponent(shapeType)}` : '';
+            const response = await fetch(`/api/test/tasks/${taskId}/counts/${query}`);
             if (!response.ok) {
                 setErrorStatus(response.status);
                 const errorData = await response.json().catch(() => ({}));
@@ -49,7 +52,7 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
         } finally {
             setLoading(false);
         }
-    }, [taskId]);
+    }, [taskId, shapeType]);
 
     useEffect(() => {
         fetchCounts();

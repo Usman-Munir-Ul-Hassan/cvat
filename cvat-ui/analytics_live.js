@@ -132,7 +132,15 @@
             </div>
             <div class="analytics-summary-text" style="margin-top: 4px; font-size: 13px; color: #8c8c8c;"></div>
           </div>
-          <div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <label style="font-size: 12px; color: #595959; font-weight: 500;">Filter Shape:</label>
+            <select class="analytics-shape-type-select" style="height: 28px; padding: 0 8px; border: 1px solid #d9d9d9; border-radius: 4px; font-size: 12px; background: #fff; cursor: pointer; color: #262626;">
+              <option value="all">All Shape Types</option>
+              <option value="polygon">Polygon (Segmentation)</option>
+              <option value="rectangle">Rectangle (Bounding Box)</option>
+              <option value="polyline">Polyline</option>
+              <option value="points">Points</option>
+            </select>
             <button class="ant-btn ant-btn-default ant-btn-sm analytics-refresh-btn" style="border-radius: 4px;">
               🔄 Refresh
             </button>
@@ -156,25 +164,35 @@
   function attachEventListeners(taskId) {
     document.querySelectorAll('.analytics-refresh-btn').forEach(function (btn) {
       btn.onclick = function () {
-        loadData(taskId);
+        const select = document.querySelector('.analytics-shape-type-select');
+        const shapeType = select ? select.value : 'all';
+        loadData(taskId, shapeType);
+      };
+    });
+    document.querySelectorAll('.analytics-shape-type-select').forEach(function (sel) {
+      sel.onchange = function () {
+        loadData(taskId, sel.value);
       };
     });
   }
 
-  function loadData(taskId) {
+  function loadData(taskId, shapeType) {
+    shapeType = shapeType || 'all';
     const bodies = document.querySelectorAll('.analytics-body');
     const summaries = document.querySelectorAll('.analytics-summary-text');
     if (!bodies.length) return;
 
+    const typeQuery = shapeType !== 'all' ? `?shape_type=${encodeURIComponent(shapeType)}` : '';
+
     bodies.forEach(function (body) {
       body.innerHTML = `
         <div style="text-align: center; padding: 36px 0;">
-          <div style="color: #1890ff; font-size: 14px;">⏳ Querying /api/test/tasks/${taskId}/counts/...</div>
+          <div style="color: #1890ff; font-size: 14px;">⏳ Querying /api/test/tasks/${taskId}/counts/${typeQuery}...</div>
         </div>
       `;
     });
 
-    fetch(`/api/test/tasks/${taskId}/counts/`)
+    fetch(`/api/test/tasks/${taskId}/counts/${typeQuery}`)
       .then(function (res) {
         if (!res.ok) {
           const status = res.status;
@@ -193,13 +211,14 @@
       })
       .then(function (data) {
         if (!data || data.length === 0) {
-          summaries.forEach(function (s) { s.innerText = 'No annotations present on this task'; });
+          const filterMsg = shapeType !== 'all' ? ` for shape type "${shapeType}"` : '';
+          summaries.forEach(function (s) { s.innerText = `No annotations present${filterMsg}`; });
           bodies.forEach(function (body) {
             body.innerHTML = `
               <div style="text-align: center; padding: 40px 0;">
                 <div style="font-size: 40px; margin-bottom: 8px;">📭</div>
-                <div style="font-size: 16px; font-weight: 500; color: #595959;">No annotations found for this task</div>
-                <div style="font-size: 13px; color: #8c8c8c; margin-top: 4px;">This task contains 0 annotations drawn or imported.</div>
+                <div style="font-size: 16px; font-weight: 500; color: #595959;">No annotations found${filterMsg}</div>
+                <div style="font-size: 13px; color: #8c8c8c; margin-top: 4px;">This task contains 0 annotations ${shapeType !== 'all' ? 'with geometry ' + shapeType : 'drawn or imported'}.</div>
                 <button onclick="window.location.href='/tasks/${taskId}'" class="ant-btn ant-btn-primary" style="margin-top: 16px; border-radius: 4px;">
                   ← Back to Task #${taskId}
                 </button>

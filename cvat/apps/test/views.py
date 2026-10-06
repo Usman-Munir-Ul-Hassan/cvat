@@ -34,9 +34,13 @@ class TaskAnnotationCountsView(APIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
+        shape_type = request.query_params.get("shape_type")
+        qs = LabeledShape.objects.filter(job__segment__task_id=pk)
+        if shape_type and shape_type.strip().lower() not in ("all", ""):
+            qs = qs.filter(type=shape_type.strip().lower())
+
         counts = (
-            LabeledShape.objects.filter(job__segment__task_id=pk)
-            .values("label__name")
+            qs.values("label__name")
             .annotate(count=Count("id"))
             .order_by("-count", "label__name")
         )
