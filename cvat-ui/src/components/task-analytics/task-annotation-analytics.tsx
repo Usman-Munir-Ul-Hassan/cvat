@@ -3,6 +3,7 @@
 // SPDX-License-Identifier: MIT
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useHistory } from 'react-router';
 import { Row, Col } from 'antd/lib/grid';
 import Spin from 'antd/lib/spin';
 import Alert from 'antd/lib/alert';
@@ -10,8 +11,7 @@ import Empty from 'antd/lib/empty';
 import Button from 'antd/lib/button';
 import Card from 'antd/lib/card';
 import Typography from 'antd/lib/typography';
-import Table from 'antd/lib/table';
-import { ReloadOutlined } from '@ant-design/icons';
+import { ReloadOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
 
@@ -25,6 +25,7 @@ interface Props {
 }
 
 function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
+    const history = useHistory();
     const [counts, setCounts] = useState<AnnotationCount[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -53,35 +54,90 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
 
     if (loading) {
         return (
-            <div style={{ textAlign: 'center', padding: '60px 0' }}>
-                <Spin size='large' tip='Loading annotation counts...' />
-            </div>
+            <Card
+                title={
+                    <Title level={4} style={{ margin: 0 }}>
+                        📊 Annotation Analytics (Task #{taskId})
+                    </Title>
+                }
+            >
+                <div style={{ textAlign: 'center', padding: '60px 0' }}>
+                    <Spin size='large' tip='Loading annotation counts...' />
+                </div>
+            </Card>
         );
     }
 
     if (error) {
         return (
-            <div style={{ padding: '24px 0' }}>
-                <Alert
-                    type='error'
-                    message='Failed to load annotation counts'
-                    description={error}
-                    showIcon
-                    action={
-                        <Button size='small' danger onClick={fetchCounts} icon={<ReloadOutlined />}>
-                            Retry
-                        </Button>
-                    }
-                />
-            </div>
+            <Card
+                title={
+                    <Title level={4} style={{ margin: 0 }}>
+                        📊 Annotation Analytics (Task #{taskId})
+                    </Title>
+                }
+            >
+                <div style={{ padding: '16px 0' }}>
+                    <Alert
+                        type='error'
+                        message='Failed to load annotation counts'
+                        description={error}
+                        showIcon
+                        action={
+                            <Button
+                                size='middle'
+                                danger
+                                type='primary'
+                                onClick={fetchCounts}
+                                icon={<ReloadOutlined />}
+                            >
+                                Retry
+                            </Button>
+                        }
+                    />
+                </div>
+            </Card>
         );
     }
 
     if (!counts || counts.length === 0) {
         return (
-            <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                <Empty description='No annotations found for this task' />
-            </div>
+            <Card
+                title={
+                    <Title level={4} style={{ margin: 0 }}>
+                        📊 Annotation Analytics (Task #{taskId})
+                    </Title>
+                }
+                extra={
+                    <Button icon={<ReloadOutlined />} onClick={fetchCounts}>
+                        Refresh
+                    </Button>
+                }
+            >
+                <div style={{ padding: '40px 0', textAlign: 'center' }}>
+                    <Empty
+                        description={
+                            <div>
+                                <div style={{ fontSize: 16, fontWeight: 500, color: '#595959' }}>
+                                    No annotations found for this task
+                                </div>
+                                <div style={{ color: '#8c8c8c', marginTop: 4, fontSize: 13 }}>
+                                    This task contains 0 annotations drawn or imported.
+                                </div>
+                            </div>
+                        }
+                    >
+                        <Button
+                            type='primary'
+                            icon={<ArrowLeftOutlined />}
+                            style={{ marginTop: 12 }}
+                            onClick={() => history.push(`/tasks/${taskId}`)}
+                        >
+                            Back to Task #{taskId}
+                        </Button>
+                    </Empty>
+                </div>
+            </Card>
         );
     }
 

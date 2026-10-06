@@ -2,7 +2,28 @@
 (function () {
   console.log('[Analytics] Live analytics module active.');
 
+  // Permanently hide the premium placeholder banner via CSS
+  const style = document.createElement('style');
+  style.id = 'cvat-analytics-override-css';
+  style.textContent = `
+    .cvat-paid-feature-placeholder-wrapper,
+    .cvat-paid-feature-placeholder {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0 !important;
+      overflow: hidden !important;
+    }
+  `;
+  if (!document.getElementById('cvat-analytics-override-css')) {
+    document.head.appendChild(style);
+  }
+
   function injectAnalytics() {
+    // Remove any premium placeholder immediately
+    document.querySelectorAll('.cvat-paid-feature-placeholder-wrapper, .cvat-paid-feature-placeholder').forEach(function (el) {
+      el.remove();
+    });
+
     const path = window.location.pathname;
 
     // Case 1: On dedicated analytics route /tasks/:id/analytics
@@ -23,23 +44,23 @@
 
   // 1. Dedicated Analytics Route (/tasks/:id/analytics)
   function renderAnalyticsPage(taskId) {
+    // Remove any remaining paid placeholders
+    document.querySelectorAll('.cvat-paid-feature-placeholder-wrapper, .cvat-paid-feature-placeholder').forEach(function (el) {
+      el.remove();
+    });
+
     const existing = document.getElementById('cvat-analytics-container');
     if (existing && existing.dataset.taskId === taskId) return;
 
-    // Only inject inside CVAT's inner analytics container or paid placeholder
-    const inner = document.querySelector('.cvat-analytics-inner');
-    const placeholder = document.querySelector('.cvat-paid-feature-placeholder');
+    // Only inject inside CVAT's inner analytics container or inner wrapper
+    const inner = document.querySelector('.cvat-analytics-inner') || document.querySelector('.cvat-analytics-inner-wrapper');
 
-    if (!inner && !placeholder) {
+    if (!inner) {
       // If layout hasn't mounted yet, wait for next tick
       return;
     }
 
     if (existing) existing.remove();
-
-    if (placeholder) {
-      placeholder.style.display = 'none';
-    }
 
     const container = document.createElement('div');
     container.id = 'cvat-analytics-container';
@@ -49,11 +70,7 @@
 
     container.innerHTML = getAnalyticsCardHTML(taskId);
 
-    if (inner) {
-      inner.appendChild(container);
-    } else if (placeholder && placeholder.parentElement) {
-      placeholder.parentElement.appendChild(container);
-    }
+    inner.appendChild(container);
 
     attachEventListeners(taskId);
     loadData(taskId);
@@ -174,9 +191,12 @@
           bodies.forEach(function (body) {
             body.innerHTML = `
               <div style="text-align: center; padding: 40px 0;">
-                <div style="font-size: 36px; margin-bottom: 8px;">📭</div>
-                <div style="font-size: 15px; font-weight: 500; color: #595959;">No annotations found for this task</div>
-                <div style="font-size: 13px; color: #8c8c8c; margin-top: 4px;">Task has 0 annotations drawn or imported.</div>
+                <div style="font-size: 40px; margin-bottom: 8px;">📭</div>
+                <div style="font-size: 16px; font-weight: 500; color: #595959;">No annotations found for this task</div>
+                <div style="font-size: 13px; color: #8c8c8c; margin-top: 4px;">This task contains 0 annotations drawn or imported.</div>
+                <button onclick="window.location.href='/tasks/${taskId}'" class="ant-btn ant-btn-primary" style="margin-top: 16px; border-radius: 4px;">
+                  ← Back to Task #${taskId}
+                </button>
               </div>
             `;
           });
