@@ -48,6 +48,13 @@ export default function DetailsComponent(props: DetailsComponentProps): JSX.Elem
                 )}
             </Col>
             <Col>
+                <Button
+                    size='middle'
+                    style={{ marginRight: '8px' }}
+                    onClick={() => history.push(`/tasks/${taskInstance.id}/analytics`)}
+                >
+                    Analytics
+                </Button>
                 <TaskActionsComponent
                     taskInstance={taskInstance}
                     onUpdateTask={onUpdateTask}
