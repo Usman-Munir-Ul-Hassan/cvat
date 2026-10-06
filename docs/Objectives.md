@@ -11,6 +11,8 @@
 | | **Target** | 100% match — every class name and count in the API response must exactly equal the database query result. |
 | | **Conditions** | Task #1 loaded with 37 COCO annotations across 12 classes (person: 12, bottle: 8, cup: 4, wine glass: 3, etc.). |
 | | **Not included** | Tasks belonging to other users or projects (tested separately under auth). |
+| | **Actual Result** | **100% exact match**. Tested live against Task #1 (`person: 12, bottle: 8, cup: 4, wine glass: 3, cell phone: 2, spoon: 2, dining table: 1, knife: 1, oven: 1, refrigerator: 1, handbag: 1, clock: 1`). Task #2 (empty) returned `[]` (HTTP 200). Task #99999 returned HTTP 404. |
+| | **Status** | **PASSED** ✅ |
 
 ### OBJ-2: Analytics page renders a readable bar chart
 

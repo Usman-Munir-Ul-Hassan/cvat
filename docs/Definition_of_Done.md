@@ -6,9 +6,9 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
 
 ## 1. Mandatory Floor Checklist (Items 1 – 4)
 
-- [ ] **Item 1: API Endpoint Returns Correct Counts**
+- [x] **Item 1: API Endpoint Returns Correct Counts**
   - *Criteria*: Endpoint `/api/test/tasks/<id>/counts/` returns JSON per-class counts matching direct database query on Task #1 (person: 12, bottle: 8, cup: 4, wine glass: 3, cell phone: 2, spoon: 2, dining table: 1, knife: 1, oven: 1, refrigerator: 1, handbag: 1, clock: 1).
-  - *Evidence*: `pending`
+  - *Evidence*: **VERIFIED**. Direct HTTP GET to `http://localhost:8080/api/test/tasks/1/counts/` returns HTTP 200 with all 12 classes matching PostgreSQL `LabeledShape` aggregation identically: `[{"label":"person","count":12},{"label":"bottle","count":8},{"label":"cup","count":4},{"label":"wine glass","count":3},{"label":"cell phone","count":2},{"label":"spoon","count":2},{"label":"clock","count":1},{"label":"dining table","count":1},{"label":"handbag","count":1},{"label":"knife","count":1},{"label":"oven","count":1},{"label":"refrigerator","count":1}]`. Tested Task #2 returning `[]` (HTTP 200) and Task #99999 returning `404 Not Found`.
 
 - [ ] **Item 2: Web Interface Page Calls the Endpoint**
   - *Criteria*: A page/tab exists in CVAT web interface that triggers an HTTP GET to `/api/test/tasks/<id>/counts/`.
