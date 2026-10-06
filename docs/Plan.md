@@ -53,7 +53,7 @@ A flat per-class count tells an engineer how many labels exist, but fails to ind
 
 | Order | Deliverable | How We Will Reach It | Estimated Time | Status |
 |---|---|---|---|---|
-| **7** | **Item 7: Shape Type Filter** | 1. In `cvat/apps/test/views.py`, accept optional `?shape_type=` query param, filtering `LabeledShape.objects.filter(type=...)`.<br>2. In the UI, add an Ant Design Select dropdown filter (`All Types`, `Polygon`, `Rectangle`, `Polyline`, `Points`) in the card header.<br>3. Verify filtering with matching type (`polygon` = 37) and non-matching type (`rectangle` = 0) with clean empty state. | 0.25 Hour | **In Progress** ⏳ |
+| **7** | **Item 7: Shape Type Filter** | 1. In `cvat/apps/test/views.py`, accept optional `?shape_type=` query param, filtering `LabeledShape.objects.filter(type=...)`.<br>2. In the UI, add an Ant Design Select dropdown filter (`All Types`, `Polygon`, `Rectangle`, `Polyline`, `Points`) in the card header.<br>3. Verify filtering with matching type (`polygon` = 37) and non-matching type (`rectangle` = 0) with clean empty state. | 0.25 Hour (Actual: 0.15h) | **Completed** ✅ |
 
 ---
 

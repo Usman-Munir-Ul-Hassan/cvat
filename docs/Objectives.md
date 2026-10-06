@@ -73,8 +73,21 @@
 | | **Not included** | Cold-start first load or simulated network throttling. |
 | | **Raw Output** | `Run 1: 0.052327 s (52.3 ms)`<br>`Run 2: 0.050510 s (50.5 ms)`<br>`Run 3: 0.051014 s (51.0 ms)`<br>`Run 4: 0.060935 s (60.9 ms)`<br>`Run 5: 0.052183 s (52.2 ms)` |
 | | **Actual Result** | **Target Met**:<br>- **Median**: **52.2 ms** (below the 60 ms target threshold)<br>- **Spread**: **50.5 ms – 60.9 ms** (Range: 10.4 ms) |
+### OBJ-7: Filter annotations by geometric shape type (Item 7)
+
+> **Why we chose this filter**: Computer vision models strictly consume specific annotation geometries — object detectors require bounding boxes (`rectangle`), instance segmentors require polygons (`polygon`), and pose estimators require keypoints (`points`). Exposing geometry filtering directly informs ML practitioners whether task annotations match their model architecture.
+
+| ID | Field | Entry |
+|---|---|---|
+| **MO-7** | **What is measured** | Whether `/api/test/tasks/{id}/counts/?shape_type={type}` filters annotation counts by geometry type (`polygon`, `rectangle`, etc.) and handles non-matching filters cleanly. |
+| | **How** | 1. Query matching filter: `curl http://localhost:8080/api/test/tasks/1/counts/?shape_type=polygon`<br>2. Query non-matching filter: `curl http://localhost:8080/api/test/tasks/1/counts/?shape_type=rectangle`<br>3. Query default (all types): `curl http://localhost:8080/api/test/tasks/1/counts/` |
+| | **Target** | `polygon` returns all 37 annotations across 12 classes; `rectangle` returns `[]` (empty count array); default returns all 37 annotations. |
+| | **Conditions** | Task #1 loaded with 37 polygon annotations. |
+| | **Not included** | 3D cuboids or custom SVG path shapes. |
+| | **Actual Result** | **100% Exact Match**:<br>- `?shape_type=polygon` returned `HTTP 200` with 37 annotations across 12 classes.<br>- `?shape_type=rectangle` returned `HTTP 200` with `[]` and UI rendered clean empty state.<br>- Default (no param) returned `HTTP 200` with all 37 annotations. |
 | | **Status** | **PASSED** ✅ |
 
 ---
+
 
 

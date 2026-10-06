@@ -40,10 +40,16 @@ This checklist establishes the acceptance criteria for the mandatory floor (Item
     - Computed metrics: **Median = 52.2 ms**, **Spread = 50.5 ms – 60.9 ms** (Range: 10.4 ms).
     - Status: Target achieved.
 
+- [x] **Item 7: Geometric Shape Type Filter**
+  - *Criteria*: One filter beyond plain count implemented with an explicit reason why it was chosen.
+  - *Evidence*: **VERIFIED**.
+    - Rationale: Computer vision training pipelines require specific annotation formats (bounding boxes for object detectors, polygons for instance segmentation, keypoints for pose models).
+    - API endpoint accepts `?shape_type=polygon|rectangle|polyline|points`. Tested `polygon` returning 37 annotations across 12 classes; tested `rectangle` returning `[]` (empty count array) with clean UI empty state.
+    - UI card header includes an Ant Design `<select>` dropdown dynamically refetching and updating the bar chart.
+
 ---
 
 ## 2. Declared Unfinished Work (Required by Assessment Rules)
-The following items were intentionally not attempted or deferred to ensure delivered items (1–6) are rock-solid:
-- **Item 7 (Custom Filter / Grouping)**: Deferred to secondary milestone.
+The following items were intentionally not attempted or deferred to ensure delivered items (1–7) are rock-solid:
 - **Item 8 (WebSocket Live Updates)**: Skipped due to architectural complexity within 8 hours.
 - **Item 9 (WebSocket Reconnection)**: Skipped alongside Item 8.
