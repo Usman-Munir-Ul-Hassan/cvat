@@ -177,10 +177,16 @@
     fetch(`/api/test/tasks/${taskId}/counts/`)
       .then(function (res) {
         if (!res.ok) {
+          const status = res.status;
           return res.json().then(function (data) {
-            throw new Error(data.detail || 'HTTP Error ' + res.status);
+            const err = new Error(data.detail || 'HTTP Error ' + status);
+            err.status = status;
+            throw err;
           }).catch(function (e) {
-            throw new Error(e.message || 'HTTP Error ' + res.status);
+            if (e.status) throw e;
+            const err = new Error(e.message || 'HTTP Error ' + status);
+            err.status = status;
+            throw err;
           });
         }
         return res.json();
@@ -257,7 +263,21 @@
       })
       .catch(function (err) {
         summaries.forEach(function (s) { s.innerText = ''; });
-        const errorHTML = `
+        const isAuthError = err.status === 401 || err.status === 403;
+        const errorHTML = isAuthError ? `
+          <div style="background: #fffbe6; border: 1px solid #ffe58f; border-radius: 6px; padding: 28px; text-align: center;">
+            <div style="font-size: 36px; margin-bottom: 8px;">🔒</div>
+            <div style="font-size: 16px; font-weight: 600; color: #d48806; margin-bottom: 4px;">
+              Access Denied (${err.status === 401 ? '401 Unauthorized' : '403 Forbidden'})
+            </div>
+            <div style="color: #595959; font-size: 13px; margin-bottom: 16px;">
+              ${err.message || 'You do not have permission to view analytics for this task.'}
+            </div>
+            <button onclick="window.location.href='/tasks'" class="ant-btn ant-btn-primary" style="border-radius: 4px;">
+              ← Back to Tasks
+            </button>
+          </div>
+        ` : `
           <div style="background: #fff2f0; border: 1px solid #ffccc7; border-radius: 6px; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;">
             <div>
               <div style="font-weight: 600; color: #cf1322; margin-bottom: 2px;">❌ Failed to load annotation counts</div>

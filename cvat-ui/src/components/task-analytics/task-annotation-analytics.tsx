@@ -29,13 +29,16 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
     const [counts, setCounts] = useState<AnnotationCount[] | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [errorStatus, setErrorStatus] = useState<number | null>(null);
 
     const fetchCounts = useCallback(async () => {
         setLoading(true);
         setError(null);
+        setErrorStatus(null);
         try {
             const response = await fetch(`/api/test/tasks/${taskId}/counts/`);
             if (!response.ok) {
+                setErrorStatus(response.status);
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.detail || `Request failed with HTTP status ${response.status}`);
             }
@@ -69,6 +72,7 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
     }
 
     if (error) {
+        const isAuthError = errorStatus === 401 || errorStatus === 403;
         return (
             <Card
                 title={
@@ -78,23 +82,42 @@ function TaskAnnotationAnalytics({ taskId }: Props): JSX.Element {
                 }
             >
                 <div style={{ padding: '16px 0' }}>
-                    <Alert
-                        type='error'
-                        message='Failed to load annotation counts'
-                        description={error}
-                        showIcon
-                        action={
-                            <Button
-                                size='middle'
-                                danger
-                                type='primary'
-                                onClick={fetchCounts}
-                                icon={<ReloadOutlined />}
-                            >
-                                Retry
-                            </Button>
-                        }
-                    />
+                    {isAuthError ? (
+                        <Alert
+                            type='warning'
+                            message={`Access Denied (${errorStatus === 401 ? '401 Unauthorized' : '403 Forbidden'})`}
+                            description={error}
+                            showIcon
+                            action={
+                                <Button
+                                    size='middle'
+                                    type='primary'
+                                    onClick={() => history.push('/tasks')}
+                                    icon={<ArrowLeftOutlined />}
+                                >
+                                    Back to Tasks
+                                </Button>
+                            }
+                        />
+                    ) : (
+                        <Alert
+                            type='error'
+                            message='Failed to load annotation counts'
+                            description={error}
+                            showIcon
+                            action={
+                                <Button
+                                    size='middle'
+                                    danger
+                                    type='primary'
+                                    onClick={fetchCounts}
+                                    icon={<ReloadOutlined />}
+                                >
+                                    Retry
+                                </Button>
+                            }
+                        />
+                    )}
                 </div>
             </Card>
         );
